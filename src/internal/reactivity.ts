@@ -1,34 +1,52 @@
 export interface Dependency {
   readonly observers: Set<Computation>;
+  version?: number;
   refresh?: () => void;
 }
 
 export interface Computation extends Dependency {
   readonly dependencies: Set<Dependency>;
   nextDependencies: Set<Dependency> | undefined;
+  nextDependencyVersions: Map<Dependency, number> | undefined;
+  changedDuringEvaluation: boolean;
   readonly onInvalidate: () => void;
 }
 
 let activeComputation: Computation | undefined;
 
 export function trackDependency(dependency: Dependency): void {
-  activeComputation?.nextDependencies?.add(dependency);
+  const computation = activeComputation;
+  if (!computation?.nextDependencies) {
+    return;
+  }
+
+  computation.nextDependencies.add(dependency);
+  if (!computation.nextDependencyVersions?.has(dependency)) {
+    computation.nextDependencyVersions?.set(dependency, dependency.version ?? 0);
+  }
 }
 
 export function runTracked<T>(computation: Computation, callback: () => T): T {
   const previousComputation = activeComputation;
   const previousNextDependencies = computation.nextDependencies;
+  const previousDependencyVersions = computation.nextDependencyVersions;
   const nextDependencies = new Set<Dependency>();
+  const dependencyVersions = new Map<Dependency, number>();
 
   computation.nextDependencies = nextDependencies;
+  computation.nextDependencyVersions = dependencyVersions;
   activeComputation = computation;
 
   try {
     const result = callback();
+    computation.changedDuringEvaluation = [...dependencyVersions].some(
+      ([dependency, version]) => (dependency.version ?? 0) !== version,
+    );
     reconcileDependencies(computation, nextDependencies);
     return result;
   } finally {
     computation.nextDependencies = previousNextDependencies;
+    computation.nextDependencyVersions = previousDependencyVersions;
     activeComputation = previousComputation;
   }
 }
@@ -57,6 +75,8 @@ export function createComputation(onInvalidate: () => void): Computation {
     observers: new Set<Computation>(),
     dependencies: new Set<Dependency>(),
     nextDependencies: undefined,
+    nextDependencyVersions: undefined,
+    changedDuringEvaluation: false,
     onInvalidate,
   };
 }

@@ -59,6 +59,7 @@ function refresh<T>(node: ComputedNode<T>): void {
     node.dirty = false;
 
     if (changed) {
+      node.version = (node.version ?? 0) + 1;
       notifyObservers(node);
     }
   } finally {
@@ -85,8 +86,8 @@ export function computed<T>(
   node.refresh = () => refresh(node);
 
   const read = (() => {
-    trackDependency(node);
     refresh(node);
+    trackDependency(node);
     return node.value as T;
   }) as ComputedAccessor<T>;
 

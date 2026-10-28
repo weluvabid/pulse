@@ -18,6 +18,7 @@ interface SignalNode<T> extends Dependency {
 export function signal<T>(initialValue: T, options: SignalOptions<T> = {}): SignalAccessor<T> {
   const node: SignalNode<T> = {
     value: initialValue,
+    version: 0,
     equals: options.equals ?? Object.is,
     observers: new Set(),
   };
@@ -33,6 +34,7 @@ export function signal<T>(initialValue: T, options: SignalOptions<T> = {}): Sign
     }
 
     node.value = value;
+    node.version = (node.version ?? 0) + 1;
     notifyObservers(node);
   };
 
