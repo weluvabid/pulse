@@ -1,7 +1,1 @@
-/**
- * Pulse public entry point.
- *
- * The public API is intentionally not implemented until the Phase 0
- * behavioral contracts are frozen.
- */
-export {};
+export { signal, type SignalAccessor, type SignalOptions } from "./signal.js";
