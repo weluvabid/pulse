@@ -74,14 +74,11 @@ describe("computed", () => {
   });
 
   it("detects direct and indirect cycles", () => {
-    let direct!: () => number;
-    direct = computed(() => direct());
+    const direct: () => number = computed(() => direct());
     expect(() => direct()).toThrow(ComputedCycleError);
 
-    let first!: () => number;
-    let second!: () => number;
-    first = computed(() => second());
-    second = computed(() => first());
+    const first: () => number = computed(() => second());
+    const second: () => number = computed(() => first());
     expect(() => first()).toThrow(ComputedCycleError);
   });
 

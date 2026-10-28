@@ -1,5 +1,6 @@
 import { notifyObservers, trackDependency, type Dependency } from "./internal/reactivity.js";
-import { batch as batchUpdates } from "./internal/scheduler.js";
+import { batchNotifications } from "./internal/scheduler.js";
+import { createReactiveId, emitReactiveEvent } from "./instrumentation.js";
 
 export interface SignalOptions<T> {
   readonly equals?: (previous: T, next: T) => boolean;
@@ -12,12 +13,14 @@ export interface SignalAccessor<T> {
 }
 
 interface SignalNode<T> extends Dependency {
+  readonly id: number;
   value: T;
   readonly equals: (previous: T, next: T) => boolean;
 }
 
 export function signal<T>(initialValue: T, options: SignalOptions<T> = {}): SignalAccessor<T> {
   const node: SignalNode<T> = {
+    id: createReactiveId(),
     value: initialValue,
     version: 0,
     equals: options.equals ?? Object.is,
@@ -36,7 +39,8 @@ export function signal<T>(initialValue: T, options: SignalOptions<T> = {}): Sign
 
     node.value = value;
     node.version = (node.version ?? 0) + 1;
-    batchUpdates(() => notifyObservers(node));
+    emitReactiveEvent({ type: "signal:write", id: node.id, version: node.version });
+    batchNotifications(() => notifyObservers(node));
   };
 
   read.update = (updater: (current: T) => T): void => {

@@ -14,3 +14,9 @@ export {
 } from "./effect.js";
 export { signal, type SignalAccessor, type SignalOptions } from "./signal.js";
 export { batch, ReactiveCycleError } from "./internal/scheduler.js";
+
+export {
+  onReactiveEvent,
+  type ReactiveEvent,
+  type ReactiveEventListener,
+} from "./instrumentation.js";

@@ -5,8 +5,8 @@ import {
   runTracked,
   trackDependency,
   type Computation,
-  type Dependency,
 } from "./internal/reactivity.js";
+import { createReactiveId, emitReactiveEvent } from "./instrumentation.js";
 
 export interface ComputedOptions<T> {
   readonly equals?: (previous: T, next: T) => boolean;
@@ -24,6 +24,7 @@ export class ComputedCycleError extends Error {
 }
 
 interface ComputedNode<T> extends Computation {
+  readonly id: number;
   dirty: boolean;
   evaluating: boolean;
   hasValue: boolean;
@@ -58,11 +59,15 @@ function refresh<T>(node: ComputedNode<T>): void {
     node.value = nextValue;
     node.hasValue = true;
     node.dirty = false;
+    emitReactiveEvent({ type: "computed:evaluate", id: node.id, changed });
 
     if (changed) {
       node.version = (node.version ?? 0) + 1;
       notifyObservers(node);
     }
+  } catch (error) {
+    emitReactiveEvent({ type: "computed:error", id: node.id });
+    throw error;
   } finally {
     node.evaluating = false;
   }
@@ -72,8 +77,8 @@ export function computed<T>(
   derive: () => T,
   options: ComputedOptions<T> = {},
 ): ComputedAccessor<T> {
-  let node: ComputedNode<T>;
-  node = {
+  const node: ComputedNode<T> = {
+    id: createReactiveId(),
     ...createComputation(() => {
       if (!node.dirty) {
         node.dirty = true;

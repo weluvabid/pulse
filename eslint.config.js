@@ -10,6 +10,25 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   prettier,
   {
+    files: ["benchmarks/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        console: "readonly",
+        process: "readonly",
+      },
+    },
+  },
+  {
+    files: ["playground/**/*.js"],
+    languageOptions: {
+      globals: {
+        document: "readonly",
+        window: "readonly",
+        console: "readonly",
+      },
+    },
+  },
+  {
     files: ["**/*.ts"],
     rules: {
       "@typescript-eslint/consistent-type-imports": "error",

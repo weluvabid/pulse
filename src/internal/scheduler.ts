@@ -1,3 +1,5 @@
+import { emitReactiveEvent } from "../instrumentation.js";
+
 export interface ScheduledJob {
   readonly active: boolean;
   run(): void;
@@ -15,7 +17,16 @@ export function schedule(job: ScheduledJob): void {
 }
 
 export function batch<T>(callback: () => T): T {
+  return runBatch(callback, true);
+}
+
+export function batchNotifications<T>(callback: () => T): T {
+  return runBatch(callback, false);
+}
+
+function runBatch<T>(callback: () => T, instrument: boolean): T {
   batchDepth++;
+  if (instrument) emitReactiveEvent({ type: "batch:start", depth: batchDepth });
   let result!: T;
   let callbackError: unknown;
   let callbackFailed = false;
@@ -27,6 +38,7 @@ export function batch<T>(callback: () => T): T {
     callbackError = error;
   } finally {
     batchDepth--;
+    if (instrument) emitReactiveEvent({ type: "batch:end", depth: batchDepth });
   }
 
   let flushError: unknown;

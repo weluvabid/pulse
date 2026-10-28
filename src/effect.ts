@@ -1,12 +1,12 @@
 import {
   createComputation,
   dependenciesChanged,
-  notifyObservers,
   refreshDependencies,
   runTracked,
   type Computation,
 } from "./internal/reactivity.js";
 import { ReactiveCycleError, schedule, type ScheduledJob } from "./internal/scheduler.js";
+import { createReactiveId, emitReactiveEvent } from "./instrumentation.js";
 
 export type Cleanup = () => void;
 export type CleanupRegistrar = (cleanup: Cleanup) => void;
@@ -16,6 +16,7 @@ export type EffectCallback = (onCleanup: CleanupRegistrar) => void;
 export { ReactiveCycleError as EffectCycleError };
 
 interface EffectNode extends Computation, ScheduledJob {
+  readonly id: number;
   active: boolean;
   running: boolean;
   readonly callback: EffectCallback;
@@ -43,7 +44,9 @@ function runCleanups(node: EffectNode): void {
 function disposeNode(node: EffectNode): void {
   if (!node.active) return;
   node.active = false;
-  node.parent && node.parent.children.splice(node.parent.children.indexOf(node), 1);
+  if (node.parent) {
+    node.parent.children.splice(node.parent.children.indexOf(node), 1);
+  }
   const errors: unknown[] = [];
 
   for (const child of [...node.children].reverse()) {
@@ -73,6 +76,7 @@ function execute(node: EffectNode): void {
   refreshDependencies(node);
   if (node.dependencyVersions.size > 0 && !dependenciesChanged(node)) return;
 
+  emitReactiveEvent({ type: "effect:run", id: node.id });
   node.running = true;
   const previousOwner = activeOwner;
   const errors: unknown[] = [];
@@ -103,6 +107,7 @@ function execute(node: EffectNode): void {
   }
 
   if (node.changedDuringEvaluation && node.active) schedule(node);
+  if (errors.length > 0) emitReactiveEvent({ type: "effect:error", id: node.id });
   if (errors.length === 1) throw errors[0];
   if (errors.length > 1) throw new AggregateError(errors, "Effect execution failed.");
 }
@@ -110,6 +115,7 @@ function execute(node: EffectNode): void {
 export function effect(callback: EffectCallback): Disposer {
   const parent = activeOwner;
   const node: EffectNode = {
+    id: createReactiveId(),
     ...createComputation(() => schedule(node)),
     onStale: () => schedule(node),
     active: true,

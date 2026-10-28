@@ -43,7 +43,11 @@ describe("reactive properties", () => {
         let runs = 0;
         const dispose = effect(() => {
           runs++;
-          branch() ? left() : right();
+          if (branch()) {
+            left();
+          } else {
+            right();
+          }
         });
 
         for (const next of branches) branch.set(next);
