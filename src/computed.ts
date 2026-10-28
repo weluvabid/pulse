@@ -1,5 +1,6 @@
 import {
   createComputation,
+  markObserversStale,
   notifyObservers,
   runTracked,
   trackDependency,
@@ -74,8 +75,17 @@ export function computed<T>(
   let node: ComputedNode<T>;
   node = {
     ...createComputation(() => {
-      node.dirty = true;
+      if (!node.dirty) {
+        node.dirty = true;
+        markObserversStale(node);
+      }
     }),
+    onStale: () => {
+      if (!node.dirty) {
+        node.dirty = true;
+        markObserversStale(node);
+      }
+    },
     dirty: true,
     evaluating: false,
     hasValue: false,

@@ -9,7 +9,9 @@ export interface Computation extends Dependency {
   nextDependencies: Set<Dependency> | undefined;
   nextDependencyVersions: Map<Dependency, number> | undefined;
   changedDuringEvaluation: boolean;
+  dependencyVersions: Map<Dependency, number>;
   readonly onInvalidate: () => void;
+  readonly onStale?: () => void;
 }
 
 let activeComputation: Computation | undefined;
@@ -43,6 +45,7 @@ export function runTracked<T>(computation: Computation, callback: () => T): T {
       ([dependency, version]) => (dependency.version ?? 0) !== version,
     );
     reconcileDependencies(computation, nextDependencies);
+    computation.dependencyVersions = dependencyVersions;
     return result;
   } finally {
     computation.nextDependencies = previousNextDependencies;
@@ -77,6 +80,7 @@ export function createComputation(onInvalidate: () => void): Computation {
     nextDependencies: undefined,
     nextDependencyVersions: undefined,
     changedDuringEvaluation: false,
+    dependencyVersions: new Map(),
     onInvalidate,
   };
 }
@@ -85,4 +89,26 @@ export function notifyObservers(dependency: Dependency): void {
   for (const observer of [...dependency.observers]) {
     observer.onInvalidate();
   }
+}
+
+export function markObserversStale(dependency: Dependency): void {
+  for (const observer of [...dependency.observers]) {
+    observer.onStale?.();
+  }
+}
+
+
+export function refreshDependencies(computation: Computation): void {
+  for (const dependency of computation.dependencies) {
+    dependency.refresh?.();
+  }
+}
+
+export function dependenciesChanged(computation: Computation): boolean {
+  for (const [dependency, version] of computation.dependencyVersions) {
+    if ((dependency.version ?? 0) !== version) {
+      return true;
+    }
+  }
+  return false;
 }
