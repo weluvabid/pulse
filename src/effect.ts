@@ -43,7 +43,7 @@ function runCleanups(node: EffectNode): void {
 function disposeNode(node: EffectNode): void {
   if (!node.active) return;
   node.active = false;
-  node.parent && (node.parent.children.splice(node.parent.children.indexOf(node), 1));
+  node.parent && node.parent.children.splice(node.parent.children.indexOf(node), 1);
   const errors: unknown[] = [];
 
   for (const child of [...node.children].reverse()) {
@@ -94,7 +94,7 @@ function execute(node: EffectNode): void {
 
   activeOwner = node;
   try {
-    runTracked(node, () => node.callback(cleanup => node.cleanups.push(cleanup)));
+    runTracked(node, () => node.callback((cleanup) => node.cleanups.push(cleanup)));
   } catch (error) {
     errors.push(error);
   } finally {

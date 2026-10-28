@@ -18,7 +18,7 @@ describe("effects and scheduling", () => {
     const condition = signal(true);
     const left = signal(1);
     const right = signal(2);
-    const run = vi.fn(() => condition() ? left() : right());
+    const run = vi.fn(() => (condition() ? left() : right()));
     effect(run);
 
     condition.set(false);
@@ -30,7 +30,7 @@ describe("effects and scheduling", () => {
   it("runs cleanup before rerun and on disposal in reverse order", () => {
     const source = signal(0);
     const order: number[] = [];
-    const dispose = effect(onCleanup => {
+    const dispose = effect((onCleanup) => {
       source();
       onCleanup(() => order.push(1));
       onCleanup(() => order.push(2));
@@ -95,10 +95,12 @@ describe("effects and scheduling", () => {
     const run = vi.fn(() => source());
     effect(run);
 
-    expect(() => batch(() => {
-      source.set(1);
-      throw new Error("batch failed");
-    })).toThrow("batch failed");
+    expect(() =>
+      batch(() => {
+        source.set(1);
+        throw new Error("batch failed");
+      }),
+    ).toThrow("batch failed");
     expect(run).toHaveBeenCalledTimes(2);
     source.set(2);
     expect(run).toHaveBeenCalledTimes(3);

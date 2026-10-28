@@ -97,7 +97,6 @@ export function markObserversStale(dependency: Dependency): void {
   }
 }
 
-
 export function refreshDependencies(computation: Computation): void {
   for (const dependency of computation.dependencies) {
     dependency.refresh?.();
