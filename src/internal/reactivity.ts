@@ -1,8 +1,9 @@
 export interface Dependency {
   readonly observers: Set<Computation>;
+  refresh?: () => void;
 }
 
-export interface Computation {
+export interface Computation extends Dependency {
   readonly dependencies: Set<Dependency>;
   nextDependencies: Set<Dependency> | undefined;
   readonly onInvalidate: () => void;
@@ -53,6 +54,7 @@ function reconcileDependencies(computation: Computation, nextDependencies: Set<D
 
 export function createComputation(onInvalidate: () => void): Computation {
   return {
+    observers: new Set<Computation>(),
     dependencies: new Set<Dependency>(),
     nextDependencies: undefined,
     onInvalidate,
