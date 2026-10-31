@@ -4,9 +4,9 @@ import {
   refreshDependencies,
   runTracked,
   type Computation,
-} from "./internal/reactivity.js";
-import { ReactiveCycleError, schedule, type ScheduledJob } from "./internal/scheduler.js";
-import { createReactiveId, emitReactiveEvent } from "./instrumentation.js";
+} from './internal/reactivity.js';
+import { ReactiveCycleError, schedule, type ScheduledJob } from './internal/scheduler.js';
+import { createReactiveId, emitReactiveEvent } from './instrumentation.js';
 
 export type Cleanup = () => void;
 export type CleanupRegistrar = (cleanup: Cleanup) => void;
@@ -30,6 +30,7 @@ let activeOwner: EffectNode | undefined;
 function runCleanups(node: EffectNode): void {
   const cleanups = node.cleanups.splice(0).reverse();
   const errors: unknown[] = [];
+
   for (const cleanup of cleanups) {
     try {
       cleanup();
@@ -37,16 +38,21 @@ function runCleanups(node: EffectNode): void {
       errors.push(error);
     }
   }
+
   if (errors.length === 1) throw errors[0];
-  if (errors.length > 1) throw new AggregateError(errors, "Multiple effect cleanups failed.");
+
+  if (errors.length > 1) throw new AggregateError(errors, 'Multiple effect cleanups failed.');
 }
 
 function disposeNode(node: EffectNode): void {
   if (!node.active) return;
+
   node.active = false;
+
   if (node.parent) {
     node.parent.children.splice(node.parent.children.indexOf(node), 1);
   }
+
   const errors: unknown[] = [];
 
   for (const child of [...node.children].reverse()) {
@@ -56,9 +62,11 @@ function disposeNode(node: EffectNode): void {
       errors.push(error);
     }
   }
+
   node.children.length = 0;
 
   for (const dependency of node.dependencies) dependency.observers.delete(node);
+
   node.dependencies.clear();
 
   try {
@@ -68,15 +76,18 @@ function disposeNode(node: EffectNode): void {
   }
 
   if (errors.length === 1) throw errors[0];
-  if (errors.length > 1) throw new AggregateError(errors, "Effect disposal failed.");
+
+  if (errors.length > 1) throw new AggregateError(errors, 'Effect disposal failed.');
 }
 
 function execute(node: EffectNode): void {
   if (!node.active || node.running) return;
+
   refreshDependencies(node);
+
   if (node.dependencyVersions.size > 0 && !dependenciesChanged(node)) return;
 
-  emitReactiveEvent({ type: "effect:run", id: node.id });
+  emitReactiveEvent({ type: 'effect:run', id: node.id });
   node.running = true;
   const previousOwner = activeOwner;
   const errors: unknown[] = [];
@@ -88,6 +99,7 @@ function execute(node: EffectNode): void {
       errors.push(error);
     }
   }
+
   node.children.length = 0;
 
   try {
@@ -97,6 +109,7 @@ function execute(node: EffectNode): void {
   }
 
   activeOwner = node;
+
   try {
     runTracked(node, () => node.callback((cleanup) => node.cleanups.push(cleanup)));
   } catch (error) {
@@ -107,9 +120,12 @@ function execute(node: EffectNode): void {
   }
 
   if (node.changedDuringEvaluation && node.active) schedule(node);
-  if (errors.length > 0) emitReactiveEvent({ type: "effect:error", id: node.id });
+
+  if (errors.length > 0) emitReactiveEvent({ type: 'effect:error', id: node.id });
+
   if (errors.length === 1) throw errors[0];
-  if (errors.length > 1) throw new AggregateError(errors, "Effect execution failed.");
+
+  if (errors.length > 1) throw new AggregateError(errors, 'Effect execution failed.');
 }
 
 export function effect(callback: EffectCallback): Disposer {
@@ -128,6 +144,7 @@ export function effect(callback: EffectCallback): Disposer {
   };
 
   if (parent?.active) parent.children.push(node);
+
   execute(node);
 
   return () => disposeNode(node);

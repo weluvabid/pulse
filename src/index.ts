@@ -3,7 +3,7 @@ export {
   ComputedCycleError,
   type ComputedAccessor,
   type ComputedOptions,
-} from "./computed.js";
+} from './computed.js';
 export {
   effect,
   EffectCycleError,
@@ -11,12 +11,12 @@ export {
   type CleanupRegistrar,
   type Disposer,
   type EffectCallback,
-} from "./effect.js";
-export { signal, type SignalAccessor, type SignalOptions } from "./signal.js";
-export { batch, ReactiveCycleError } from "./internal/scheduler.js";
+} from './effect.js';
+export { signal, type SignalAccessor, type SignalOptions } from './signal.js';
+export { batch, ReactiveCycleError } from './internal/scheduler.js';
 
 export {
   onReactiveEvent,
   type ReactiveEvent,
   type ReactiveEventListener,
-} from "./instrumentation.js";
+} from './instrumentation.js';

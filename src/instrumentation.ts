@@ -1,11 +1,11 @@
 export type ReactiveEvent =
-  | { readonly type: "signal:write"; readonly id: number; readonly version: number }
-  | { readonly type: "computed:evaluate"; readonly id: number; readonly changed: boolean }
-  | { readonly type: "computed:error"; readonly id: number }
-  | { readonly type: "effect:run"; readonly id: number }
-  | { readonly type: "effect:error"; readonly id: number }
-  | { readonly type: "batch:start"; readonly depth: number }
-  | { readonly type: "batch:end"; readonly depth: number };
+  | { readonly type: 'signal:write'; readonly id: number; readonly version: number }
+  | { readonly type: 'computed:evaluate'; readonly id: number; readonly changed: boolean }
+  | { readonly type: 'computed:error'; readonly id: number }
+  | { readonly type: 'effect:run'; readonly id: number }
+  | { readonly type: 'effect:error'; readonly id: number }
+  | { readonly type: 'batch:start'; readonly depth: number }
+  | { readonly type: 'batch:end'; readonly depth: number };
 
 export type ReactiveEventListener = (event: ReactiveEvent) => void;
 

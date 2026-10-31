@@ -16,20 +16,27 @@ The runtime uses a hybrid push-pull model: writes propagate invalidation, comput
 Requires Node.js 22 or newer and npm 10 or newer.
 
 ```sh
-npm install
+npm ci
+npm run hooks:install
 npm run check
 ```
+
+The Git hooks enforce the repository's formatting, lint and type-check gates before commits, and validate Conventional Commit subjects.
 
 Useful commands:
 
 ```sh
 npm test
 npm run test:watch
+npm run test:hardening
 npm run typecheck
 npm run lint
 npm run format:check
 npm run build
+npm run benchmark
 ```
+
+`npm run check` runs formatting, linting, type checking, the full test suite and a production build. CI runs this command on Node.js 22, 24 and 26; CodeQL analyzes the JavaScript and TypeScript code separately.
 
 ## Instrumentation playground
 

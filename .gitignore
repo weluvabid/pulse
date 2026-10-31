@@ -24,3 +24,13 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Local tooling
+.husky/_
+*.swp
+*.swo
+
+# Test artifacts
+.nyc_output/
+playwright-report/
+test-results/

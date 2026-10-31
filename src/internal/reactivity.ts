@@ -18,11 +18,13 @@ let activeComputation: Computation | undefined;
 
 export function trackDependency(dependency: Dependency): void {
   const computation = activeComputation;
+
   if (!computation?.nextDependencies) {
     return;
   }
 
   computation.nextDependencies.add(dependency);
+
   if (!computation.nextDependencyVersions?.has(dependency)) {
     computation.nextDependencyVersions?.set(dependency, dependency.version ?? 0);
   }
@@ -41,6 +43,7 @@ export function runTracked<T>(computation: Computation, callback: () => T): T {
 
   try {
     const result = callback();
+
     computation.changedDuringEvaluation = [...dependencyVersions].some(
       ([dependency, version]) => (dependency.version ?? 0) !== version,
     );
@@ -68,6 +71,7 @@ function reconcileDependencies(computation: Computation, nextDependencies: Set<D
   }
 
   computation.dependencies.clear();
+
   for (const dependency of nextDependencies) {
     computation.dependencies.add(dependency);
   }
@@ -109,5 +113,6 @@ export function dependenciesChanged(computation: Computation): boolean {
       return true;
     }
   }
+
   return false;
 }

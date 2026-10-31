@@ -5,8 +5,8 @@ import {
   runTracked,
   trackDependency,
   type Computation,
-} from "./internal/reactivity.js";
-import { createReactiveId, emitReactiveEvent } from "./instrumentation.js";
+} from './internal/reactivity.js';
+import { createReactiveId, emitReactiveEvent } from './instrumentation.js';
 
 export interface ComputedOptions<T> {
   readonly equals?: (previous: T, next: T) => boolean;
@@ -18,8 +18,8 @@ export interface ComputedAccessor<T> {
 
 export class ComputedCycleError extends Error {
   constructor() {
-    super("A computed value cannot depend on itself during evaluation.");
-    this.name = "ComputedCycleError";
+    super('A computed value cannot depend on itself during evaluation.');
+    this.name = 'ComputedCycleError';
   }
 }
 
@@ -59,14 +59,14 @@ function refresh<T>(node: ComputedNode<T>): void {
     node.value = nextValue;
     node.hasValue = true;
     node.dirty = false;
-    emitReactiveEvent({ type: "computed:evaluate", id: node.id, changed });
+    emitReactiveEvent({ type: 'computed:evaluate', id: node.id, changed });
 
     if (changed) {
       node.version = (node.version ?? 0) + 1;
       notifyObservers(node);
     }
   } catch (error) {
-    emitReactiveEvent({ type: "computed:error", id: node.id });
+    emitReactiveEvent({ type: 'computed:error', id: node.id });
     throw error;
   } finally {
     node.evaluating = false;
@@ -98,6 +98,7 @@ export function computed<T>(
     derive,
     equals: options.equals ?? Object.is,
   };
+
   node.refresh = () => refresh(node);
 
   const read = (() => {

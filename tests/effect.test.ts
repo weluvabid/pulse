@@ -1,8 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
-import { batch, computed, effect, signal, ReactiveCycleError } from "../src/index.js";
+import { describe, expect, it, vi } from 'vitest';
+import { batch, computed, effect, signal, ReactiveCycleError } from '../src/index.js';
 
-describe("effects and scheduling", () => {
-  it("runs initially and responds to changes", () => {
+describe('effects and scheduling', () => {
+  it('runs initially and responds to changes', () => {
     const value = signal(1);
     const run = vi.fn(() => value());
     const dispose = effect(run);
@@ -14,11 +14,12 @@ describe("effects and scheduling", () => {
     expect(run).toHaveBeenCalledTimes(2);
   });
 
-  it("reconciles conditional dependencies", () => {
+  it('reconciles conditional dependencies', () => {
     const condition = signal(true);
     const left = signal(1);
     const right = signal(2);
     const run = vi.fn(() => (condition() ? left() : right()));
+
     effect(run);
 
     condition.set(false);
@@ -27,7 +28,7 @@ describe("effects and scheduling", () => {
     expect(run).toHaveBeenCalledTimes(3);
   });
 
-  it("runs cleanup before rerun and on disposal in reverse order", () => {
+  it('runs cleanup before rerun and on disposal in reverse order', () => {
     const source = signal(0);
     const order: number[] = [];
     const dispose = effect((onCleanup) => {
@@ -41,10 +42,11 @@ describe("effects and scheduling", () => {
     expect(order).toEqual([2, 1, 2, 1]);
   });
 
-  it("disposes children when an owner reruns", () => {
+  it('disposes children when an owner reruns', () => {
     const enabled = signal(true);
     const source = signal(0);
     const childRun = vi.fn(() => source());
+
     effect(() => {
       if (enabled()) effect(childRun);
     });
@@ -55,10 +57,11 @@ describe("effects and scheduling", () => {
     expect(childRun).toHaveBeenCalledTimes(2);
   });
 
-  it("coalesces updates inside nested batches", () => {
+  it('coalesces updates inside nested batches', () => {
     const left = signal(0);
     const right = signal(0);
     const run = vi.fn(() => [left(), right()]);
+
     effect(run);
 
     batch(() => {
@@ -73,10 +76,11 @@ describe("effects and scheduling", () => {
     expect(run.mock.results[1]?.value).toEqual([2, 1]);
   });
 
-  it("does not rerun an effect when a computed result stays equal", () => {
+  it('does not rerun an effect when a computed result stays equal', () => {
     const source = signal(1);
     const parity = computed(() => source() % 2);
     const run = vi.fn(() => parity());
+
     effect(run);
 
     source.set(3);
@@ -85,22 +89,24 @@ describe("effects and scheduling", () => {
     expect(run).toHaveBeenCalledTimes(2);
   });
 
-  it("bounds runaway synchronous effects", () => {
+  it('bounds runaway synchronous effects', () => {
     const source = signal(0);
+
     expect(() => effect(() => source.set(source() + 1))).toThrow(ReactiveCycleError);
   });
 
-  it("restores batch state when the callback throws", () => {
+  it('restores batch state when the callback throws', () => {
     const source = signal(0);
     const run = vi.fn(() => source());
+
     effect(run);
 
     expect(() =>
       batch(() => {
         source.set(1);
-        throw new Error("batch failed");
+        throw new Error('batch failed');
       }),
-    ).toThrow("batch failed");
+    ).toThrow('batch failed');
     expect(run).toHaveBeenCalledTimes(2);
     source.set(2);
     expect(run).toHaveBeenCalledTimes(3);

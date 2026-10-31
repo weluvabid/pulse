@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(git rev-parse --show-toplevel)
+cd "$ROOT"
+
+if [ ! -x node_modules/.bin/prettier ] || [ ! -x node_modules/.bin/eslint ]; then
+  echo "Pulse pre-commit: dependencies are missing. Run 'npm ci' first." >&2
+  exit 1
+fi
+
+npm run check:precommit

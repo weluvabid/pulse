@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
-import fc from "fast-check";
-import { batch, computed, effect, signal } from "../src/index.js";
+import { describe, expect, it } from 'vitest';
+import fc from 'fast-check';
+import { batch, computed, effect, signal } from '../src/index.js';
 
-describe("reactive properties", () => {
-  it("keeps batched signal values and computed results consistent", () => {
+describe('reactive properties', () => {
+  it('keeps batched signal values and computed results consistent', () => {
     fc.assert(
       fc.property(
         fc.array(fc.tuple(fc.integer(), fc.integer()), { minLength: 1, maxLength: 100 }),
@@ -22,6 +22,7 @@ describe("reactive properties", () => {
           });
 
           const [lastLeft, lastRight] = updates[updates.length - 1]!;
+
           expect(left()).toBe(lastLeft);
           expect(right()).toBe(lastRight);
           expect(total()).toBe(lastLeft + lastRight);
@@ -34,7 +35,7 @@ describe("reactive properties", () => {
     );
   });
 
-  it("removes obsolete dependencies after arbitrary branch changes", () => {
+  it('removes obsolete dependencies after arbitrary branch changes', () => {
     fc.assert(
       fc.property(fc.array(fc.boolean(), { minLength: 1, maxLength: 50 }), (branches) => {
         const branch = signal(true);
@@ -43,6 +44,7 @@ describe("reactive properties", () => {
         let runs = 0;
         const dispose = effect(() => {
           runs++;
+
           if (branch()) {
             left();
           } else {
@@ -51,6 +53,7 @@ describe("reactive properties", () => {
         });
 
         for (const next of branches) branch.set(next);
+
         const beforeStaleWrite = runs;
         const activeBranch = branches.at(-1)!;
 
@@ -58,8 +61,10 @@ describe("reactive properties", () => {
         else left.set(left() + 1);
 
         expect(runs).toBe(beforeStaleWrite);
+
         if (activeBranch) left.set(left() + 1);
         else right.set(right() + 1);
+
         expect(runs).toBe(beforeStaleWrite + 1);
         dispose();
       }),

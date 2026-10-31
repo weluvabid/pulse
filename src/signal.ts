@@ -1,6 +1,6 @@
-import { notifyObservers, trackDependency, type Dependency } from "./internal/reactivity.js";
-import { batchNotifications } from "./internal/scheduler.js";
-import { createReactiveId, emitReactiveEvent } from "./instrumentation.js";
+import { notifyObservers, trackDependency, type Dependency } from './internal/reactivity.js';
+import { batchNotifications } from './internal/scheduler.js';
+import { createReactiveId, emitReactiveEvent } from './instrumentation.js';
 
 export interface SignalOptions<T> {
   readonly equals?: (previous: T, next: T) => boolean;
@@ -39,7 +39,7 @@ export function signal<T>(initialValue: T, options: SignalOptions<T> = {}): Sign
 
     node.value = value;
     node.version = (node.version ?? 0) + 1;
-    emitReactiveEvent({ type: "signal:write", id: node.id, version: node.version });
+    emitReactiveEvent({ type: 'signal:write', id: node.id, version: node.version });
     batchNotifications(() => notifyObservers(node));
   };
 
