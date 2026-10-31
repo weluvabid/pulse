@@ -2,6 +2,7 @@
   import { onDestroy } from 'svelte';
   import { RotateCcw } from '@lucide/svelte';
   import {
+    batch,
     computed,
     effect,
     onReactiveEvent,
@@ -87,6 +88,13 @@
     quantity.update((value) => Math.max(1, value + amount));
   }
 
+  function batchUpdate(): void {
+    batch(() => {
+      price.update((value) => value + 6);
+      quantity.update((value) => value + 1);
+    });
+  }
+
   function reset(): void {
     price.set(initialPrice);
     quantity.set(initialQuantity);
@@ -106,7 +114,7 @@
   />
 </svelte:head>
 
-<div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-28 sm:px-6">
+<div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 sm:px-6">
   <SiteHeader {darkMode} onToggleTheme={toggleTheme} />
 
   <main class="flex-1 py-8 sm:py-10">
@@ -139,7 +147,12 @@ const subtotal = computed(() => price() * quantity())
 const tax = computed(() => subtotal() * 0.18)
 const total = computed(() => subtotal() + tax())
 
-effect(() => render(total()))`}</code
+effect(() => render(total()))
+
+batch(() => {
+  price.update((value) => value + 6)
+  quantity.update((value) => value + 1)
+})`}</code
                 ></pre>
             </div>
 
@@ -152,6 +165,7 @@ effect(() => render(total()))`}</code
                 >Quantity −</Button.Root
               >
               <Button.Root size="sm" onclick={() => updateQuantity(1)}>Quantity +</Button.Root>
+              <Button.Root variant="secondary" onclick={batchUpdate}>Batch update</Button.Root>
               <Button.Root variant="ghost" class="ml-auto" onclick={reset}>
                 <RotateCcw size={15} /> Reset
               </Button.Root>
