@@ -44,7 +44,7 @@ export function signal<T>(initialValue: T, options: SignalOptions<T> = {}): Sign
   };
 
   read.update = (updater: (current: T) => T): void => {
-    // Read the stored value directly: an update operation is a write, not a
+    // Read the stored value directly: an update is a write operation, not a
     // reactive read, and therefore must not create a dependency by itself.
     read.set(updater(node.value));
   };

@@ -1,10 +1,10 @@
 import {
+  type Computation,
   createComputation,
   markObserversStale,
   notifyObservers,
   runTracked,
   trackDependency,
-  type Computation,
 } from './internal/reactivity.js';
 import { createReactiveId, emitReactiveEvent } from './instrumentation.js';
 
@@ -101,11 +101,9 @@ export function computed<T>(
 
   node.refresh = () => refresh(node);
 
-  const read = (() => {
+  return (() => {
     refresh(node);
     trackDependency(node);
     return node.value as T;
   }) as ComputedAccessor<T>;
-
-  return read;
 }

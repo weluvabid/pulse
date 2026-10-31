@@ -1,13 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import {
-    batch,
-    computed,
-    effect,
-    onReactiveEvent,
-    signal,
-    type ReactiveEvent,
-  } from '../../src/index.js';
+  import { batch, computed, effect, onReactiveEvent, signal, type ReactiveEvent } from '../../src';
   import SiteFooter from '$lib/components/site/SiteFooter.svelte';
   import SiteHeader from '$lib/components/site/SiteHeader.svelte';
   import ProgramPanel from '$lib/components/playground/ProgramPanel.svelte';
