@@ -34,3 +34,6 @@ Thumbs.db
 .nyc_output/
 playwright-report/
 test-results/
+
+demo/node_modules/
+demo/dist/

@@ -17,7 +17,7 @@ const paddingRules = {
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'coverage/**', 'node_modules/**'],
+    ignores: ['**/dist/**', '**/coverage/**', '**/node_modules/**'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -48,21 +48,19 @@ export default tseslint.config(
     },
   },
   {
+    files: ['demo/src/**/*.ts'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+      },
+    },
+  },
+  {
     files: ['benchmarks/**/*.mjs'],
     languageOptions: {
       globals: {
         console: 'readonly',
         process: 'readonly',
-      },
-    },
-  },
-  {
-    files: ['playground/**/*.js'],
-    languageOptions: {
-      globals: {
-        document: 'readonly',
-        window: 'readonly',
-        console: 'readonly',
       },
     },
   },

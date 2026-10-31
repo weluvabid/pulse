@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta
+      name="description"
+      content="Explore Pulse, a lightweight framework-independent reactive runtime."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pulse — Fine-grained reactivity" />
+    <meta
+      property="og:description"
+      content="A lightweight reactive runtime built around signals, computed values, effects and batching."
+    />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%pulse.svg" />
+    <script>
+      (() => {
+        let preference;
+        try {
+          preference = localStorage.getItem('pulse-theme');
+        } catch {
+          // Storage can be unavailable; use the system preference.
+        }
+        const dark = preference
+          ? preference === 'dark'
+          : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const root = document.documentElement;
+        root.classList.toggle('dark', dark);
+        root.style.colorScheme = dark ? 'dark' : 'light';
+        root.style.backgroundColor = dark ? '#0b0b0b' : '#ffffff';
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute('content', dark ? '#0b0b0b' : '#ffffff');
+      })();
+    </script>
+    <title>Pulse — Fine-grained reactivity</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -50,3 +50,25 @@ python3 -m http.server 8000
 Open `http://localhost:8000/playground/`. The playground shows signal and computed values alongside effect executions and the instrumentation event stream.
 
 Subscribe to runtime events with `onReactiveEvent(listener)`. It returns an unsubscribe function. Events expose stable runtime IDs and state transitions, not application values.
+
+## Interactive demo
+
+The Svelte demo lives in `demo/` and imports the runtime directly from `src/`.
+
+```bash
+npm ci
+npm install --prefix demo
+npm run dev
+```
+
+Build the runtime and demo together:
+
+```bash
+npm run build
+```
+
+Run the complete repository checks:
+
+```bash
+npm run check
+```
