@@ -1,9 +1,8 @@
 {
   "name": "@weluvabid/pulse",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "A small, framework-independent reactive runtime.",
+  "description": "A small, framework-independent reactive runtime for JavaScript and TypeScript.",
   "engines": {
     "node": ">=22.0.0",
     "npm": ">=10.0.0"
@@ -22,7 +21,8 @@
     "format:check": "prettier --check .",
     "benchmark": "npm run build:core && node benchmarks/reactivity.mjs",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run build",
-    "hooks:install": "node scripts/install-hooks.mjs"
+    "hooks:install": "node scripts/install-hooks.mjs",
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "@eslint/js": "9.39.0",
@@ -38,5 +38,37 @@
   },
   "allowScripts": {
     "fsevents@2.3.3": true
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weluvabid/pulse.git"
+  },
+  "homepage": "https://github.com/weluvabid/pulse#readme",
+  "bugs": {
+    "url": "https://github.com/weluvabid/pulse/issues"
+  },
+  "keywords": [
+    "reactivity",
+    "reactive",
+    "signals",
+    "computed",
+    "effects",
+    "typescript"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
 }
