@@ -9,22 +9,20 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:demo",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "build:core": "npm run clean && tsc -p tsconfig.build.json",
-    "build:demo": "npm --prefix demo run build",
     "clean": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
-    "dev": "npm --prefix demo run dev",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "typecheck": "npm run typecheck:core && npm run typecheck:demo",
+    "typecheck": "tsc --noEmit",
     "typecheck:core": "tsc --noEmit",
-    "typecheck:demo": "npm --prefix demo run check",
-    "format": "prettier --write . && npm --prefix demo run format",
-    "format:check": "prettier --check . && npm --prefix demo run format:check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "benchmark": "npm run build:core && node benchmarks/reactivity.mjs",
-    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build"
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run build",
+    "hooks:install": "node scripts/install-hooks.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.0",
@@ -35,7 +33,8 @@
     "prettier": "3.6.2",
     "typescript": "5.9.3",
     "typescript-eslint": "8.46.0",
-    "vitest": "5.0.5"
+    "vitest": "5.0.5",
+    "globals": "14.0.0"
   },
   "allowScripts": {
     "fsevents@2.3.3": true

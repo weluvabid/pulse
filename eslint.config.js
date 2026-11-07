@@ -48,23 +48,6 @@ export default tseslint.config(
     },
   },
   {
-    files: ['demo/src/**/*.ts'],
-    languageOptions: {
-      globals: {
-        document: 'readonly',
-      },
-    },
-  },
-  {
-    files: ['benchmarks/**/*.mjs'],
-    languageOptions: {
-      globals: {
-        console: 'readonly',
-        process: 'readonly',
-      },
-    },
-  },
-  {
     files: ['benchmarks/**/*.mjs', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: {
